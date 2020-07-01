@@ -50,7 +50,48 @@ void preOrder(TreeNode *root) {
     preOrder(root->right); 
 }
 
+void printZigZag(TreeNode *root) {
+	queue<TreeNode *> q;
+	q.push(root);
+	
+	int isEven = 1;
+
+	while(!q.empty()) {
+		isEven *= -1;
+		int len = q.size();
+		vector<int> ans;
+		
+		for(int i=1; i<=len; ++i) {
+			TreeNode *node = q.front();
+			q.pop();
+
+			ans.push_back(node->val);
+
+			if(node->left) {
+				q.push(node->left);
+			}
+			if(node->right) {
+				q.push(node->right);
+			}
+		}
+
+		if(isEven == 1) {
+			for(int i=ans.size()-1; i >= 0; --i) {
+				cout << ans[i] << " ";
+			}
+		}
+		else {
+			for(auto el: ans) {
+				cout << el << " ";
+			}
+		}
+	}
+}
+
 int main() {
+    TreeNode *root = build("true");
+
+	printZigZag(root);
     
-    return 0;
+	return 0;
 }
