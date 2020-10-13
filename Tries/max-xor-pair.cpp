@@ -1,102 +1,105 @@
 #include <bits/stdc++.h>
+#define ll long long int
+#define v vector
+#define b begin
+#define e end
 
 using namespace std;
 
-class Node  {
+class Trie
+{
 public:
-	Node *left;
-	Node *right;
-
-	Node() {
-		left = NULL;
-		right = NULL;
-	}
+    Trie *left;
+    Trie *right;
 };
 
+void insert(Trie *&root, int val)
+{
+    Trie *curr = root;
 
-class Trie {
-	Node *root;
-public:
-	Trie() {
-		root = new Node();
-	}
+    for (int i = 31; i >= 0; --i)
+    {
+        int b = (val >> i) & 1;
 
-	void insert(int n) {
-		Node *temp = root;
-		for(int i=31; i>=0; --i) {
+        if (b == 0)
+        {
+            if (!curr->left)
+            {
+                curr->left = new Trie();
+            }
+            curr = curr->left;
+        }
+        else
+        {
+            if (!curr->right)
+            {
+                curr->right = new Trie();
+            }
+            curr = curr->right;
+        }
+    }
+}
 
-			int bit = (n >> i) & 1;
+int findMaxXor(Trie *head, v<int> &arr, int n)
+{
+    int max_xor = INT_MIN;
 
-			if(bit == 0) {
-				if(temp->left == NULL) {
-					temp->left = new Node();
-				}
+    for (int i = 0; i < n; ++i)
+    {
+        int val = arr[i];
+        Trie *curr = head;
+        int curr_xor = 0;
 
-				temp = temp->left;
-			}
-			else {
-				if(temp->right == NULL) {
-					temp->right = new Node();
-				}
+        for (int j = 31; j >= 0; --j)
+        {
+            int b = (val >> j) & 1;
 
-				temp = temp->right;
-			}
+            if (b == 0)
+            {
+                if (curr->right)
+                {
+                    curr_xor += pow(2, j);
+                    curr->right;
+                }
+                else
+                {
+                    curr->left;
+                }
+            }
+            else
+            {
+                if (curr->left)
+                {
+                    curr_xor += pow(2, j);
+                    curr->left;
+                }
+                else
+                {
+                    curr->left;
+                }
+            }
+        }
 
-		}
-	}
+        max_xor = max(max_xor, curr_xor);
+    }
 
-	int max_xor_helper(int n) {
-		Node *temp = root;
-		int currentAns = 0;
+    return max_xor;
+}
 
-		for(int i=31; i>=0; --i) {
+int main()
+{
+    int n;
+    cin >> n;
 
-			int bit = (n >> i) & 1;
-			if(bit == 0) {
-				//find complementary bit
-				if(temp->right != NULL) {
-					temp = temp->right;
-					currentAns += (1<<i);
-				}
-				else {
-					temp = temp->left;
-				}
-			}
-			else {
-				//current bit is 1
-				if(temp->left != NULL) {
-					temp = temp->left;
-					currentAns += (1<<i);
-				}
-				else {
-					temp = temp->right;
-				}
-			}
+    Trie *head = new Trie();
 
-		}
- 		
- 		return currentAns;
-	}
+    v<int> arr(n);
+    for (int i = 0; i < n; ++i)
+    {
+        cin >> arr[i];
+        insert(head, arr[i]);
+    }
 
-	int max_xor(int *input, int n) {
-		int max_xor_value = INT_MIN;
-		for(int i=0; i<n; ++i) {
-
-			int value = input[i];
-			insert(value);
-			int current_max_xor = max_xor_helper(value);
-			cout << current_max_xor << " ";
-			max_xor_value = max(current_max_xor, max_xor_value);
-
-		}
-
-		return max_xor_value;
-	}
-};
-
-int main() {
-	int input[] = {3, 10, 5, 25, 2, 8};
-	Trie t;
-	cout << t.max_xor(input, 6);
-	return 0;
+    cout << findMaxXor(head, arr, n) << endl;
+    return 0;
 }
